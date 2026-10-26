@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Task manager</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ================= ÉCRAN DE CONNEXION / INSCRIPTION ================= -->
+    <div id="auth-screen" class="auth-overlay">
+        <div class="auth-card">
+            <h2>Task Manager</h2>
+            <p id="auth-sub">Connectez-vous pour accéder à vos tâches.</p>
+
+            <form id="auth-form" novalidate>
+                <div id="name-group" style="display:none;">
+                    <label>Nom complet</label>
+                    <input type="text" id="auth-name" placeholder="Ex: Rama KA" autocomplete="name">
+                </div>
+                <label>Email</label>
+                <input type="email" id="auth-email" placeholder="votre@email.com" autocomplete="email">
+                <label>Mot de passe</label>
+                <input type="password" id="auth-pass" placeholder="••••••••" autocomplete="current-password">
+
+                <p id="auth-error" style="color: var(--danger); font-size: 0.85rem; min-height: 1.2em; margin: 8px 0;">
+                </p>
+
+                <div class="actions"
+                    style="display:flex; justify-content:space-between; align-items:center; margin-top: 10px;">
+                    <button type="button" id="auth-switch-btn" class="btn-outline" style="border:none;">Créer un
+                        compte</button>
+                    <button type="submit" class="btn-primary" id="auth-submit-btn">Se connecter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= APPLICATION PRINCIPALE ================= -->
+    <div id="app-screen" style="display: none;">
+
+        <!-- Icônes (style trait) réutilisées partout avec <use> -->
+        <svg class="sprite" aria-hidden="true" focusable="false">
+            <symbol id="i-clock" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 6v6l4 2" />
+            </symbol>
+            <symbol id="i-edit" viewBox="0 0 24 24">
+                <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.4 2.6a2 2 0 0 1 3 3L12.4 14.6l-3.7 1 1-3.7z" />
+            </symbol>
+            <symbol id="i-check" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <path d="m9 12 2 2 4-4" />
+            </symbol>
+            <symbol id="i-trash" viewBox="0 0 24 24">
+                <path d="M3 6h18" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                <path d="M10 11v6M14 11v6" />
+            </symbol>
+            <symbol id="i-plus" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5v14" />
+            </symbol>
+            <symbol id="i-search" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+            </symbol>
+            <symbol id="i-moon" viewBox="0 0 24 24">
+                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+            </symbol>
+            <symbol id="i-sun" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="4" />
+                <path
+                    d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4" />
+            </symbol>
+            <symbol id="i-bell" viewBox="0 0 24 24">
+                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+            </symbol>
+            <symbol id="i-sliders" viewBox="0 0 24 24">
+                <path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4" />
+            </symbol>
+            <symbol id="i-chart" viewBox="0 0 24 24">
+                <path d="M3 3v16a2 2 0 0 0 2 2h16" />
+                <path d="M18 17V9M13 17V5M8 17v-3" />
+            </symbol>
+            <symbol id="i-tasks" viewBox="0 0 24 24">
+                <path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8" />
+            </symbol>
+            <symbol id="i-book" viewBox="0 0 24 24">
+                <path d="M12 7v14" />
+                <path
+                    d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
+            </symbol>
+            <symbol id="i-pencil" viewBox="0 0 24 24">
+                <path
+                    d="M21.2 6.8a1 1 0 0 0-4-4L3.8 16.2a2 2 0 0 0-.5.8L2 21.4a.5.5 0 0 0 .6.6l4.4-1.3a2 2 0 0 0 .8-.5z" />
+                <path d="m15 5 4 4" />
+            </symbol>
+            <symbol id="i-panel" viewBox="0 0 24 24">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M9 3v18" />
+            </symbol>
+            <symbol id="i-star" viewBox="0 0 24 24">
+                <path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z" />
+            </symbol>
+            <symbol id="i-archive" viewBox="0 0 24 24">
+                <rect x="2" y="3" width="20" height="5" rx="1" />
+                <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4" />
+            </symbol>
+            <symbol id="i-logout" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <path d="m16 17 5-5-5-5" />
+                <path d="M21 12H9" />
+            </symbol>
+        </svg>
+
+        <div class="app">
+            <nav class="sidebar" aria-label="Navigation">
+                <div class="logo"><svg class="ic">
+                        <use href="#i-tasks" />
+                    </svg></div>
+                <button class="side-btn" type="button" data-target="stats" title="Indicateurs"
+                    aria-label="Indicateurs"><svg class="ic">
+                        <use href="#i-chart" />
+                    </svg></button>
+                <button class="side-btn active" type="button" data-target="board" title="Tâches"
+                    aria-label="Tâches"><svg class="ic">
+                        <use href="#i-tasks" />
+                    </svg></button>
+                <button class="side-btn" type="button" disabled title="Bientôt disponible" aria-label="Notes"><svg
+                        class="ic">
+                        <use href="#i-edit" />
+                    </svg></button>
+                <button class="side-btn" type="button" disabled title="Bientôt disponible" aria-label="Éditer"><svg
+                        class="ic">
+                        <use href="#i-pencil" />
+                    </svg></button>
+                <button class="side-btn side-end" type="button" disabled title="Bientôt disponible"
+                    aria-label="Guide"><svg class="ic">
+                        <use href="#i-book" />
+                    </svg></button>
+            </nav>
+
+            <div class="content">
+                <header class="topbar">
+                    <div class="brand"><svg class="ic">
+                            <use href="#i-panel" />
+                        </svg>
+                        <h1>Task manager</h1>
+                    </div>
+                    <label class="search">
+                        <svg class="ic">
+                            <use href="#i-search" />
+                        </svg>
+                        <input id="search" type="search" placeholder="Rechercher…" aria-label="Rechercher une tâche"
+                            autocomplete="off">
+                        <kbd>Ctrl K</kbd>
+                    </label>
+                    <div class="tools">
+                        <button id="theme-btn" class="icon-btn" type="button" aria-label="Changer de thème"><svg
+                                class="ic">
+                                <use id="theme-use" href="#i-moon" />
+                            </svg></button>
+                        <div class="notif-wrap">
+                            <button id="bell-btn" class="icon-btn" type="button" aria-label="Notifications"
+                                aria-expanded="false">
+                                <svg class="ic">
+                                    <use href="#i-bell" />
+                                </svg><span id="bell-count" class="count" hidden>0</span>
+                            </button>
+                            <div id="notif" class="notif" hidden></div>
+                        </div>
+
+                        <!-- NOUVEAU BLOC UTILISATEUR -->
+                        <div class="user"
+                            style="margin-left: 10px; border-left: 1px solid var(--border); padding-left: 16px;">
+                            <div style="display:flex; align-items:center; gap:10px; margin-right: 8px;">
+                                <span class="avatar" id="user-avatar"></span>
+                                <span class="user-name" id="user-name"></span>
+                            </div>
+                            <button id="logout-btn" class="icon-btn" type="button" aria-label="Se déconnecter"
+                                title="Se déconnecter" style="color: var(--danger);">
+                                <svg class="ic">
+                                    <use href="#i-logout" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <main>
+                    <div class="toolbar">
+                        <button id="filter-btn" class="btn-outline" type="button" aria-expanded="false"
+                            aria-controls="filters"><svg class="ic">
+                                <use href="#i-sliders" />
+                            </svg>Filtrer<span id="filter-count" class="count-pill" hidden>0</span></button>
+                        <button id="add-btn" class="btn-primary" type="button"><svg class="ic">
+                                <use href="#i-plus" />
+                            </svg>Ajouter</button>
+                    </div>
+
+                    <div id="filters" class="filters" hidden>
+                        <label>Statut
+                            <select id="filter-status" autocomplete="off">
+                                <option value="all">Tous les statuts</option>
+                                <option value="todo">À faire</option>
+                                <option value="progress">En cours</option>
+                                <option value="done">Terminé</option>
+                                <option value="archived">Archivées</option>
+                            </select>
+                        </label>
+                        <label>Priorité
+                            <select id="filter-priority" autocomplete="off">
+                                <option value="all">Toutes les priorités</option>
+                                <option value="low">Basse</option>
+                                <option value="normal">Normale</option>
+                                <option value="high">Haute</option>
+                            </select>
+                        </label>
+                        <label>Échéance
+                            <select id="filter-due" autocomplete="off">
+                                <option value="all">Toutes les dates</option>
+                                <option value="late">En retard</option>
+                                <option value="today">Aujourd’hui</option>
+                                <option value="week">7 prochains jours</option>
+                            </select>
+                        </label>
+                        <label>Tri par date limite
+                            <select id="sort" autocomplete="off">
+                                <option value="asc">La plus proche</option>
+                                <option value="desc">La plus lointaine</option>
+                            </select>
+                        </label>
+                        <label>Favoris
+                            <select id="filter-fav" autocomplete="off">
+                                <option value="all">Toutes les tâches</option>
+                                <option value="fav">Favoris uniquement</option>
+                            </select>
+                        </label>
+                        <button id="reset-btn" type="button" class="btn-outline">Réinitialiser</button>
+                    </div>
+
+                    <section id="stats" class="stats" aria-label="Indicateurs">
+                        <div><strong id="stat-total">0</strong> Total</div>
+                        <div><strong id="stat-done">0</strong> Terminées</div>
+                        <div><strong id="stat-late">0</strong> En retard</div>
+                        <div><strong id="stat-rate">0 %</strong> Achèvement</div>
+                    </section>
+
+                    <div id="board" class="board"></div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE D'AJOUT / MODIFICATION -->
+    <dialog id="dialog">
+        <form id="task-form" novalidate>
+            <h2 id="dialog-title">Nouvelle tâche</h2>
+            <input type="hidden" id="task-id">
+
+            <label>Titre
+                <input id="title" maxlength="100" autocomplete="off">
+            </label>
+            <label>Description
+                <textarea id="description" rows="3" maxlength="500"></textarea>
+            </label>
+            <div class="row">
+                <label>Date limite
+                    <input type="date" id="dueDate">
+                </label>
+                <label>Catégorie
+                    <select id="category">
+                        <option value="work">Travail</option>
+                        <option value="project">Projet</option>
+                        <option value="assignment">Devoir</option>
+                        <option value="research">Recherche</option>
+                        <option value="other">Autre</option>
+                    </select>
+                </label>
+            </div>
+            <div class="row">
+                <label>Priorité
+                    <select id="priority">
+                        <option value="low">Basse</option>
+                        <option value="normal" selected>Normale</option>
+                        <option value="high">Haute</option>
+                    </select>
+                </label>
+                <label>Statut
+                    <select id="status">
+                        <option value="todo" selected>À faire</option>
+                        <option value="progress">En cours</option>
+                        <option value="done">Terminé</option>
+                    </select>
+                </label>
+            </div>
+
+            <p id="error" role="alert"></p>
+            <div class="actions">
+                <button type="button" id="cancel-btn">Annuler</button>
+                <button type="submit" class="btn-primary" id="submit-btn">Enregistrer</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
